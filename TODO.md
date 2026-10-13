@@ -1,0 +1,11 @@
+# TODO
+
+## Open (QC 2026-10-13)
+
+1. **README.md is 44 lines; STYLE.md asks for 80–200** with "what the outputs look like" and "next steps" sections. It is the course table of contents and will grow as chapters land; when chapter 2 lands, add a short "What the outputs look like" (the `make check` tail: 21 passed, the two cost tables) and a "Next steps" line.
+2. **Chapter 1 length.** Prose is 2 358 words (inside the 1 500–3 000 rule); with the four tables it is 3 034 and with code blocks 3 197. Decide whether tables count; if they do, trim about 50 words from section 3 or the exercise answers.
+3. **`cost.py` says "no free tier" but subtracts the always-free 25 GB of DynamoDB storage** (`max(table_gb - 25, 0)`). The effect here is about $0.03 a month, but the label in the chapter, `prices.json` `_about` and the README ("no free tier") disagrees with the code. Either drop the subtraction (the storage line then prints $0.05 instead of $0.02 in both columns; update the chapter table from `python cost.py`) or label that one line as "after the always-free 25 GB".
+4. **Free-tier sentences in section 5 are now labelled unverified** (QC softened them; they were from memory). Open the current AWS free-tier page, confirm which of CloudFront, Lambda and DynamoDB have always-free allowances and what changed in 2025, then rewrite the paragraph with a "checked on <date>" and remove the "not verified" wording.
+5. **Resource count with the CDK CLI.** `python app.py` synthesises 26 resources; `npx aws-cdk@2.1145.0 synth` adds one `AWS::CDK::Metadata` resource, so the CLI template has 27. The chapter's "26" is the stack's own resources; if you want the CLI number to match what readers see, say "26 plus one CDK metadata resource".
+6. **`cdk.json` has no feature-flag context**, so the CLI prints "84 feature flags are not configured". Harmless now, but behaviour can change between `aws-cdk-lib` versions; consider pinning the flags a `cdk init` project would carry.
+7. **Nothing has been deployed.** The OAC bucket policy and the Lambda's IAM grant are asserted from the template only. A one-off `cdk deploy`, a `curl` of `/api/health` and a `POST` of one reading from a personal account would make the "verified" line in WALKTHROUGH.md true end to end; `cdk destroy` afterwards keeps the bill at zero.
