@@ -26,7 +26,7 @@ flowchart LR
 ## Running the examples
 
 ```bash
-pip install -r requirements.txt   # aws-cdk-lib, constructs, pytest, ruff
+pip install -r requirements.txt   # aws-cdk-lib, constructs, boto3, pytest, ruff
 make check                         # lint, tests, synthesise every stack, print the cost tables
 ```
 
