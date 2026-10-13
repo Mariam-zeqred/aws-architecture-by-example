@@ -21,7 +21,7 @@ The brief already fixes most of the design. Pull the constraints out before touc
 | One bad device cannot break the site | devices writing unchecked into the store the page reads |
 | Public, read-mostly page | anything that needs a login to see data |
 
-The last two rows are worth a sentence about two real systems. The [queen-bee-incubator](https://github.com/Mariam-zeqred/queen-bee-incubator) and [smart-poultry-farm](https://github.com/Mariam-zeqred/smart-poultry-farm) repos both have an ESP32 writing directly to a Firebase Realtime Database with a database secret, and Flutter apps reading that database directly. Their READMEs say plainly that the database rules were open at prototype stage and that per-device authentication and locked-down rules are the path to production. This chapter deliberately avoids that shape: devices never touch the database. They go through an API that validates every reading, the page reads through the same API, and the database is private to one Lambda function.
+The last two rows are worth a sentence about two real systems. The [queen-bee-incubator](https://github.com/Mariam-zeqred/queen-bee-incubator) and [smart-poultry-farm](https://github.com/Mariam-zeqred/smart-poultry-farm) repos, according to their READMEs, both have an ESP32 writing directly to a Firebase Realtime Database with a database secret, and Flutter apps reading that database directly. The smart-poultry-farm README says plainly that the database rules are open at prototype stage and that per-device auth tokens and locked-down rules are the path to production; the queen-bee-incubator README's security note lists per-device rules, rotating the secret and real user authentication as the steps to take before any unit controls a real heater. This chapter deliberately avoids that shape: devices never touch the database. They go through an API that validates every reading, the page reads through the same API, and the database is private to one Lambda function.
 
 ## 2. Reference architecture
 
@@ -125,7 +125,7 @@ Two of these lines are bug fixes in advance. `CACHING_DISABLED` stops the edge s
 
 One line that is *not* in the stack is also instructive. A first draft set `minimum_protocol_version` to TLS 1.2; the CDK CLI warned that with the default `*.cloudfront.net` certificate the TLS policy is fixed and the setting is ignored. Only a custom domain with your own certificate lets you choose it (exercise 4). Synthesis caught that; a deploy would have kept the line and done nothing with it.
 
-**The handler.** [`examples/ch01/lambda/handler.py`](examples/ch01/lambda/handler.py) is 120 lines of standard library plus boto3. The part worth reading is validation:
+**The handler.** [`examples/ch01/lambda/handler.py`](examples/ch01/lambda/handler.py) is about 110 lines of standard library plus boto3. The part worth reading is validation:
 
 ```python
 DEVICE_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,31}$")
@@ -156,7 +156,7 @@ The table below is printed by `examples/ch01/cost.py` from the assumptions in th
 
 Three things to take from it. At today's traffic the design costs less than a phone contract. At a hundred times the traffic the bill is 84 % data transfer: 1.2 MB per visit, six million times. Compute, the part engineers optimise first, is $29 of $739, so the first optimisation here is a smaller page, not a faster function; exercise 1 puts a number on it. The device side (writes, storage) does not move between the columns at all.
 
-The free tier would remove most of the small column (CloudFront, Lambda and DynamoDB have always-free allowances; check the current pages, as AWS restructured the free tier in 2025). The model leaves it out on purpose: a design should be affordable at list price, because your production account is rarely the one that qualifies.
+A free-tier allowance may remove much of the small column: as of the author's last check, CloudFront, Lambda and DynamoDB had always-free allowances, and AWS changed the structure of its free tier in 2025. Neither statement was verified against the pricing pages while writing this chapter, so confirm them on the current free-tier page before relying on them. The model leaves the free tier out on purpose: a design should be affordable at list price, because your production account is rarely the one that qualifies.
 
 ## 6. How it fails
 
