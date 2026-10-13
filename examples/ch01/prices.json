@@ -1,0 +1,32 @@
+{
+  "_about": "List prices in USD for US East (N. Virginia), copied on 2026-10-13 from the AWS Price List API (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/<service>/current/...). Offer versions: AWSLambda 20261012223257, AmazonApiGateway 20261012212611, AmazonDynamoDB 20260911124422, AmazonS3 20261012231102, AmazonCloudFront 20261003000426, AmazonRoute53 20260911124504. First pricing tier only; free-tier allowances are NOT applied. Re-check before quoting to anyone.",
+  "cloudfront": {
+    "transfer_out_per_gb_first_10tb_us_eu": 0.085,
+    "https_requests_per_10k_us": 0.01,
+    "https_requests_per_10k_eu": 0.012
+  },
+  "s3": {
+    "storage_per_gb_month_first_50tb": 0.023,
+    "put_per_1k": 0.005,
+    "get_per_10k": 0.004
+  },
+  "api_gateway": {
+    "http_api_per_million_first_300m": 1.0,
+    "rest_api_per_million_first_333m": 3.5
+  },
+  "lambda": {
+    "requests_per_million": 0.2,
+    "gb_second_x86_tier1": 0.0000166667,
+    "gb_second_arm_tier1": 0.0000133334
+  },
+  "dynamodb_on_demand": {
+    "write_request_units_per_million": 0.625,
+    "read_request_units_per_million": 0.125,
+    "storage_per_gb_month_after_25gb_free": 0.25,
+    "pitr_per_gb_month": 0.20
+  },
+  "route53": {
+    "hosted_zone_per_month": 0.50,
+    "alias_queries_to_aws_resources": 0.0
+  }
+}

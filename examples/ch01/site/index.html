@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farm monitor</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border-bottom: 1px solid #ccc; padding: .3rem .5rem; text-align: left; }
+  #status { color: #666; }
+</style>
+</head>
+<body>
+<h1>Farm monitor</h1>
+<p id="status">Loading…</p>
+<form id="pick">
+  <label>Device <input name="device" value="field-1" pattern="[a-z0-9][a-z0-9-]{1,31}" required></label>
+  <button>Show</button>
+</form>
+<table id="readings"><thead><tr><th>Time (UTC)</th><th>°C</th><th>% RH</th></tr></thead><tbody></tbody></table>
+<script>
+  // Same origin as the page: CloudFront routes /api/* to the HTTP API, so there
+  // is no CORS and no API hostname to configure in the front end.
+  async function load(device) {
+    const status = document.getElementById("status");
+    status.textContent = "Loading…";
+    try {
+      const res = await fetch(`/api/readings/${encodeURIComponent(device)}?limit=20`);
+      if (!res.ok) throw new Error((await res.json()).error || res.statusText);
+      const { readings } = await res.json();
+      const rows = readings.map(r =>
+        `<tr><td>${new Date(r.ts * 1000).toISOString().slice(0, 19)}</td><td>${r.temp}</td><td>${r.hum}</td></tr>`);
+      document.querySelector("#readings tbody").innerHTML = rows.join("");
+      status.textContent = readings.length ? `${readings.length} readings for ${device}` : `No readings yet for ${device}`;
+    } catch (err) {
+      status.textContent = `Error: ${err.message}`;
+    }
+  }
+  document.getElementById("pick").addEventListener("submit", e => {
+    e.preventDefault();
+    load(new FormData(e.target).get("device"));
+  });
+  load("field-1");
+</script>
+</body>
+</html>

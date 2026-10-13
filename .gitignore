@@ -1,0 +1,38 @@
+# secrets and local AWS config
+.env
+.env.*
+*.pem
+*.key
+secrets.*
+!secrets.example.*
+.aws/
+
+# CDK / Terraform output
+cdk.out/
+cdk.context.json
+.cdk.staging/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# node (only if someone installs the CDK CLI locally)
+node_modules/
+package-lock.json
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# large data
+*.parquet
+*.csv.gz
