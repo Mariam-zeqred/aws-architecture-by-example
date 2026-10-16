@@ -14,7 +14,7 @@ Your AWS certificates say you know the services; this course shows you can *desi
 
 ## Chapter 1 - Static site + API + DB
 
-*What it teaches.* Extract constraints from a brief; put a static site and an API behind one CloudFront hostname (no CORS, one certificate); choose serverless when traffic is unknown and the team is small; price the design from list prices and see that data transfer, not compute, dominates at scale; walk a failure table and check each row has a line in the stack.
+*What it teaches.* Extract constraints from a brief; put a static site and an API behind one CloudFront hostname (no CORS, one certificate); choose serverless when traffic is unknown and the team is small; price it from list prices and see that data transfer, not compute, dominates at scale; walk a failure table and check each row has a line in the stack.
 
 *The example.* `examples/ch01/stack.py` is 150 lines, 26 resources. The handler takes its table as a parameter so tests run against a fake. `cost.py` prints the chapter's table from `prices.json`, which was copied from the AWS Price List API on 2026-10-13 (offer versions recorded). The CDK CLI's warning that `minimum_protocol_version` is ignored without a custom certificate was real; the chapter uses it as a teaching point and exercise 4.
 
@@ -23,6 +23,21 @@ Your AWS certificates say you know the services; this course shows you can *desi
 2. *Why is the API behind CloudFront rather than called directly?* One hostname means no CORS, one TLS certificate, one place to attach a WAF, and the static page keeps serving from edge caches even if the region is down. The cost is a little latency on `/api/*` and the need to disable caching on that behaviour, which a test asserts.
 3. *Your cost table says $739 at 200 000 visits a day. What would you cut first?* Page weight: 84 % of that bill is data transfer at 1.2 MB per visit; compute is $29. Trimming the page to 300 kB saves more than any Lambda tuning. Exercise 1 has the numbers.
 
-*What was and was not verified.* Verified here: ruff, 21 tests, `python app.py` and `cdk synth` (CLI 2.1145.0, lib 2.273.0) both produce the template, and `cost.py` reproduces the table. Not verified: a real deploy, so the bucket policy and the IAM grant are asserted from the template, not exercised. If you deploy it once and `curl` the API, say so in the README.
+*Verified / not.* ruff, 21 tests, `python app.py` and `cdk synth` (CLI 2.1145.0, lib 2.273.0) produce the template, `cost.py` reproduces the table. Not deployed, so the bucket policy and IAM grant are asserted, not exercised.
 
-*One thing you could extend.* Deploy it, record the real cold-start and warm latencies from CloudWatch for the 256 MB ARM function, and replace the chapter's "120 ms" assumption in `cost.py` with the measured value.
+*Extend.* Deploy once, read the real warm latency of the 256 MB ARM function from CloudWatch, and replace the "120 ms" assumption in `cost.py`.
+
+## Chapter 2 - IoT telemetry at scale
+
+*What it teaches.* Give every device its own X.509 certificate and a policy that names it (`${iot:Connection.Thing.ThingName}`), so a stolen certificate can only lie about one field; publish on a Basic Ingest topic so the messaging line is zero; split "latest", "30 days" and "years" into three stores because they are three access patterns; price the design at 20 / 1 000 / 100 000 devices and see which lines are per-message (rules, actions, Lambda, Firehose's 5 KB minimum), per-write (DynamoDB, half the bill) and per-device (alarms, which is why the watchdog is one scan and one metric).
+
+*The example.* `examples/ch02/stack.py`, 41 resources. `lambda/ingest.py` does the conditional status write (`ts < :ts`) so redeliveries and late backlogs cannot roll status back; `lambda/stale_scan.py` is the watchdog. `cost.py` prints three tables; the "batched x5 + provisioned" column is the honest answer to "cents per device". Prices came from the Price List API on 2026-10-16 (versions in `prices.json`).
+
+*Questions a professor may ask.*
+1. *Why not keep the HTTP API from chapter 1 for devices?* It works, and IoT Core also has an HTTPS publish endpoint. MQTT gives a persistent connection (one TLS handshake, not 1 440 a day), per-device X.509 identity with a policy that names the device, and a rules engine that fans one message out to two stores without code. The price is a client library on the device and certificate logistics (fleet provisioning at scale).
+2. *Your bill at 100 000 devices is $10 898 and half of it is DynamoDB. Is DynamoDB the wrong choice?* It is the wrong *billing mode*: on-demand is right when traffic is unknown, and a fleet on a one-minute clock is the most predictable load there is. Provisioned capacity with 20 % headroom cuts the line 2.9×; batching five readings per message cuts every per-message line 5×. Together: $2 665, 2.7 cents a device.
+3. *Why is the watchdog a scan instead of an alarm per device?* An alarm plus a custom metric is about $0.40 per device-month: $8 at 20 devices, $22 000 at 100 000, twice the rest of the system. The scan replaces a per-device price with a per-byte one ($2 a month at 100 000 devices) and needs an index at a million (exercise 5). Say also what the scan costs: ten minutes of staleness granularity and a two-scan confirmation before paging.
+
+*Verified / not.* ruff, 28 tests (49 with chapter 1), `python app.py` synthesises, `cost.py` prints the chapter's tables. Not deployed, so Basic Ingest, the policy variables and Firehose delivery are asserted from the template and from the AWS documentation; the Basic Ingest claim that `topic()` does not see the `$aws/rules/<name>` prefix is from the developer guide, not observed.
+
+*Extend.* Deploy with two things, publish as `field-1` to `field-2`'s topic and watch the broker disconnect you; then replace gzip JSON with Parquet conversion in Firehose and measure how many bytes an Athena query over one day scans before and after.
