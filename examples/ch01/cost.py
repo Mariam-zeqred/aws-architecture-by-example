@@ -63,8 +63,7 @@ def monthly_cost(s: Scenario) -> dict[str, float]:
         "DynamoDB writes": writes / 1e6 * ddb["write_request_units_per_million"],
         "DynamoDB reads": rrus / 1e6 * ddb["read_request_units_per_million"],
         "DynamoDB storage + PITR": (
-            max(table_gb - 25, 0) * ddb["storage_per_gb_month_after_25gb_free"]
-            + table_gb * ddb["pitr_per_gb_month"]
+            table_gb * ddb["storage_per_gb_month"] + table_gb * ddb["pitr_per_gb_month"]
         ),
         "S3 storage": s.site_gb * p["s3"]["storage_per_gb_month_first_50tb"],
         "Route 53 hosted zone": p["route53"]["hosted_zone_per_month"],

@@ -149,10 +149,10 @@ The table below is printed by `examples/ch01/cost.py` from the assumptions in th
 | Lambda duration (ARM) | $0.07 | $7.20 |
 | DynamoDB writes | $0.54 | $0.54 |
 | DynamoDB reads | $0.01 | $1.12 |
-| DynamoDB storage + PITR | $0.02 | $0.02 |
+| DynamoDB storage + PITR | $0.05 | $0.05 |
 | S3 storage | $0.00 | $0.00 |
 | Route 53 hosted zone | $0.50 | $0.50 |
-| **Total / month** | **$8.44** | **$739.11** |
+| **Total / month** | **$8.47** | **$739.13** |
 
 Three things to take from it. At today's traffic the design costs less than a phone contract. At a hundred times the traffic the bill is 84 % data transfer: 1.2 MB per visit, six million times. Compute, the part engineers optimise first, is $29 of $739, so the first optimisation here is a smaller page, not a faster function; exercise 1 puts a number on it. The device side (writes, storage) does not move between the columns at all.
 

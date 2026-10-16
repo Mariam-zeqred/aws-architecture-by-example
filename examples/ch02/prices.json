@@ -1,0 +1,50 @@
+{
+  "_about": "List prices in USD for US East (N. Virginia), copied from the AWS Price List API (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/<service>/current/us-east-1/index.json). Copied on 2026-10-16: AWSIoT 20261003053120, AmazonKinesisFirehose 20260911124446, AmazonAthena 20260911124408, AmazonCloudWatch 20261007115540, AWSQueueService 20260911124607, AWSGlue 20261012185542, AmazonDynamoDB 20260911124422 (provisioned capacity). Copied on 2026-10-13 for chapter 1 and reused: AWSLambda 20261012223257, AmazonDynamoDB 20260911124422 (on-demand), AmazonS3 20261012231102. Where a price has tiers, the tiers used by cost.py are listed; everything else is first tier. No free-tier allowance is applied anywhere. Re-check before quoting to anyone.",
+  "iot_core": {
+    "connection_minutes_per_million": 0.08,
+    "messages_per_million_tiers": [[1000000000, 1.0], [5000000000, 0.8], [null, 0.7]],
+    "rules_triggered_per_million": 0.15,
+    "actions_executed_per_million": 0.15,
+    "message_billing_increment_bytes": 5120,
+    "shadow_and_registry_ops_per_million": 1.25
+  },
+  "lambda": {
+    "requests_per_million": 0.2,
+    "gb_second_arm_tier1": 0.0000133334
+  },
+  "dynamodb_on_demand": {
+    "write_request_units_per_million": 0.625,
+    "read_request_units_per_million": 0.125,
+    "storage_per_gb_month": 0.25,
+    "pitr_per_gb_month": 0.20
+  },
+  "dynamodb_provisioned": {
+    "write_capacity_unit_hour": 0.00065,
+    "read_capacity_unit_hour": 0.00013
+  },
+  "firehose": {
+    "ingested_per_gb_first_500tb": 0.029,
+    "record_billing_increment_bytes": 5120
+  },
+  "s3": {
+    "storage_per_gb_month_first_50tb": 0.023,
+    "put_per_1k": 0.005,
+    "get_per_10k": 0.004
+  },
+  "athena": {
+    "per_tb_scanned": 5.0
+  },
+  "glue_catalog": {
+    "requests_per_million": 1.0,
+    "storage_per_100k_objects_month": 1.0
+  },
+  "sqs": {
+    "standard_requests_per_million": 0.40
+  },
+  "cloudwatch": {
+    "alarm_standard_per_month": 0.10,
+    "custom_metric_per_month_tiers": [[10000, 0.30], [250000, 0.10], [1000000, 0.05], [null, 0.02]],
+    "logs_ingested_per_gb": 0.50,
+    "logs_storage_per_gb_month": 0.03
+  }
+}

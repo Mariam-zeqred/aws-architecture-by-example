@@ -22,7 +22,7 @@
   "dynamodb_on_demand": {
     "write_request_units_per_million": 0.625,
     "read_request_units_per_million": 0.125,
-    "storage_per_gb_month_after_25gb_free": 0.25,
+    "storage_per_gb_month": 0.25,
     "pitr_per_gb_month": 0.20
   },
   "route53": {

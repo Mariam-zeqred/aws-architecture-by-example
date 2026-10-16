@@ -9,4 +9,4 @@ select = ["E", "F", "I", "UP", "B", "W"]
 testpaths = ["examples"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["stack", "handler", "cost"]
+known-first-party = ["stack", "handler", "ingest", "stale_scan", "cost"]

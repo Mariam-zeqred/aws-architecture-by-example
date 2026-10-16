@@ -16,7 +16,9 @@ test:
 # examples/chNN/README.md for the deploy commands you run yourself.
 synth:
 	cd examples/ch01 && $(PY) app.py && test -f cdk.out/Ch01HelloStack.template.json
+	cd examples/ch02 && $(PY) app.py && test -f cdk.out/Ch02TelemetryStack.template.json
 
 # Print each chapter's cost table from its prices.json and assumptions.
 cost:
 	cd examples/ch01 && $(PY) cost.py
+	cd examples/ch02 && $(PY) cost.py
