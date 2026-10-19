@@ -10,8 +10,20 @@
 6. **Chapter 2 exercise 4 names Kinesis Data Streams as the way around Firehose's 5 KB minimum** but `prices.json` has no Kinesis prices and the claim that Firehose bills a Kinesis source per GB without rounding is from the price list's usage-type names, not the pricing page. Fetch the Kinesis Data Streams offer file, add the line to `cost.py` as a fourth tuned column, and confirm the rounding rule on the Firehose pricing page.
 7. **Chapter 2 cost model simplifications** worth a sentence if anyone quotes it: Lambda duration is a guessed 80 ms (two DynamoDB writes, warm); the stale-scan Lambda duration is approximated as 1 s per 20 000 devices; CloudWatch Logs assumes one 150-byte line per message; the archive is 12 months at 5:1 gzip. All are named constants in `cost.py`.
 
-8. **WALKTHROUGH.md length.** STYLE.md says 300–600 words; with a section per chapter this one is about 1 000 words, like the other two courses' (911 and 966 with two chapters). Decide the course policy: one hub file plus `walkthrough/chNN.md`, or accept per-chapter growth.
+8. **WALKTHROUGH.md length.** STYLE.md says 300–600 words; with a section per chapter this one is about 1 500 words after chapter 3, like the other two courses'. Decide the course policy: one hub file plus `walkthrough/chNN.md`, or accept per-chapter growth.
+
+9. **Chapter 3 container image not built.** The sandbox has no Docker daemon, so `pipeline/Dockerfile` has never been built; `cdk deploy` builds it for ARM64. Build it once locally (`docker build --platform linux/arm64 examples/ch03/pipeline`) and run `docker run <image> train --archive ... --artifacts ... --run-id ...` against `examples/ch03/local/` to confirm the entry point and the package pins.
+
+10. **Chapter 3 throughput constants are from the sandbox CPU.** `cost.py` uses 250 000 lines/s and 50 000 rows/s (measured here: 313 940–334 849 lines/s, ~55 000 rows/s). After one real execution, read the task's `lines_per_second` and `total_seconds` from its log and replace them; the wall-time rows in section 5 move with them.
+
+11. **`features.sql` has not been run in Athena.** It is the tuned design's aggregation (UNLOAD to Parquet). Run it once against a chapter 2 archive, check the column names match `features.py`'s hourly table, and note the bytes scanned so the $1.59-a-night figure for 90 days at 100 000 devices can be checked against a real 1 000-device scan.
+
+12. **Chapter 3 S3 paths are tested against fakes.** `Store` with an `s3://` root and the gate's `S3Store` have never touched S3. The first deploy exercises both; if `list` pagination or `copy_object` misbehaves it will show in the first execution's log.
+
+13. **Chapter 3 word count.** Prose is about 3 000 words with the exercises and answers (4 600 with tables, 4 900 with code), the same question as item 1.
 
 ## Done
+
+- 2026-10-19: chapter 3 written with its example; `make check` grew a `ch03-run` target that runs the pipeline on synthetic data.
 
 - 2026-10-16: README grown to the STYLE.md shape (outputs, layout, limitations, next steps). `cost.py` in ch01 no longer subtracts the always-free 25 GB of DynamoDB storage, so the code matches the "no free tier" label; the chapter 1 table moved from $8.44 / $739.11 to $8.47 / $739.13.
