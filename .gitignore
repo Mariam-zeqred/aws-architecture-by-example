@@ -33,6 +33,9 @@ package-lock.json
 .idea/
 .DS_Store
 
+# chapter 3's local pipeline run (make ch03-run)
+examples/ch03/local/
+
 # large data
 *.parquet
 *.csv.gz

@@ -1,0 +1,51 @@
+{
+  "_about": "List prices in USD for US East (N. Virginia), copied from the AWS Price List API (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/<service>/current/us-east-1/index.json). Copied on 2026-10-19: AmazonECS 20260911124425 (Fargate ARM), AmazonStates 20260911124511 (Step Functions), AmazonSageMaker 20261016211645, AWSEvents 20260924163903 (EventBridge Scheduler), AmazonECR 20260911124425, AmazonSNS 20260915151944. Reused from chapter 2 (copied 2026-10-16 / 2026-10-13): AWSLambda 20261012223257, AmazonS3 20261012231102, AmazonAthena 20260911124408, AmazonDynamoDB 20260911124422, AmazonCloudWatch 20261007115540. Where a price has tiers, the tiers cost.py uses are listed; everything else is first tier. No free-tier allowance is applied anywhere except where a zero-price first tier is part of the list price itself (Scheduler, SNS). Re-check before quoting to anyone.",
+  "fargate": {
+    "vcpu_hour_arm": 0.03238,
+    "gb_hour_arm": 0.00356
+  },
+  "step_functions": {
+    "standard_per_transition": 0.000025,
+    "express_per_million_requests": 1.0,
+    "express_gb_second_tier1": 0.00001667
+  },
+  "sagemaker": {
+    "train_ml_m5_large_hour": 0.115,
+    "train_ml_m5_xlarge_hour": 0.23,
+    "train_ml_c5_xlarge_hour": 0.204,
+    "train_ml_g5_xlarge_hour": 1.408,
+    "transform_ml_m5_large_hour": 0.115,
+    "training_volume_gb_month": 0.14
+  },
+  "eventbridge_scheduler": {
+    "invocations_tiers": [[14000000, 0.0], [null, 0.000001]]
+  },
+  "ecr": {
+    "storage_per_gb_month": 0.10
+  },
+  "sns": {
+    "requests_tiers": [[1000000, 0.0], [null, 0.0000005]],
+    "email_tiers": [[1000, 0.0], [null, 0.00002]]
+  },
+  "lambda": {
+    "requests_per_million": 0.2,
+    "gb_second_arm_tier1": 0.0000133334
+  },
+  "s3": {
+    "storage_per_gb_month_first_50tb": 0.023,
+    "put_per_1k": 0.005,
+    "get_per_10k": 0.004
+  },
+  "athena": {
+    "per_tb_scanned": 5.0
+  },
+  "dynamodb_on_demand": {
+    "write_request_units_per_million": 0.625,
+    "storage_per_gb_month": 0.25
+  },
+  "cloudwatch": {
+    "alarm_standard_per_month": 0.10,
+    "logs_ingested_per_gb": 0.50,
+    "logs_storage_per_gb_month": 0.03
+  }
+}
