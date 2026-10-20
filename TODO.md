@@ -14,7 +14,7 @@
 
 9. **Chapter 3 container image not built.** The sandbox has no Docker daemon, so `pipeline/Dockerfile` has never been built; `cdk deploy` builds it for ARM64. Build it once locally (`docker build --platform linux/arm64 examples/ch03/pipeline`) and run `docker run <image> train --archive ... --artifacts ... --run-id ...` against `examples/ch03/local/` to confirm the entry point and the package pins.
 
-10. **Chapter 3 throughput constants are from the sandbox CPU.** `cost.py` uses 250 000 lines/s and 50 000 rows/s (measured here: 313 940–334 849 lines/s, ~55 000 rows/s). After one real execution, read the task's `lines_per_second` and `total_seconds` from its log and replace them; the wall-time rows in section 5 move with them.
+10. **Chapter 3 throughput constants are from the sandbox CPU.** `cost.py` uses 250 000 lines/s and 50 000 rows/s (measured here: 313 940–334 849 lines/s, ~55 000 rows/s). After one real execution, read the task's `lines_per_second` and `total_seconds` from its log and replace them; the wall-time rows in section 5 move with them. A second sandbox (review, 2026-10-20) measured only 191 969 lines/s on the same `make ch03-run`, below the 250 000 constant, so the wall-time rows can be optimistic by about a quarter on a slower vCPU; one real Fargate number settles it.
 
 11. **`features.sql` has not been run in Athena.** It is the tuned design's aggregation (UNLOAD to Parquet). Run it once against a chapter 2 archive, check the column names match `features.py`'s hourly table, and note the bytes scanned so the $1.59-a-night figure for 90 days at 100 000 devices can be checked against a real 1 000-device scan.
 
