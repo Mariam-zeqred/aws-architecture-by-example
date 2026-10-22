@@ -31,7 +31,7 @@ python app.py && ls cdk.out  # just the CloudFormation template (43 resources)
 python cost.py               # just the cost tables
 ```
 
-`sim.py` prints one table: the same 500 orders through the functions as written and through "naive" versions with the guards removed (server-made ids, no idempotency key, unconditional writes). With seed 1 the guarded column charges each order exactly once and the shelf matches the reservations; the naive column stores 554 orders for 500, charges 117 of them twice or more and oversells one SKU. The failure rates at the top of `sim.py` are illustrative parameters, not measurements of anything.
+`sim.py` prints one table: the same 500 orders through the functions as written and through "naive" versions with the guards removed (server-made ids, no idempotency key, unconditional writes). With seed 1 the guarded column charges each order exactly once and the shelf matches the reservations; the naive column stores 554 orders for 500, charges 128 of them twice or more and oversells one SKU. The failure rates at the top of `sim.py` are illustrative parameters, not measurements of anything.
 
 ## Deploy it yourself
 
