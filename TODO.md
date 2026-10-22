@@ -22,7 +22,15 @@
 
 13. **Chapter 3 word count.** Prose is about 3 000 words with the exercises and answers (4 600 with tables, 4 900 with code), the same question as item 1.
 
+14. **Chapter 4 has never touched AWS.** The functions are tested against `sim.FakeTable` (which interprets only the condition and update expressions they use), a fake queue, a fake bus and a fake provider. One `cdk deploy`, the README's order sequence (a 201, the same POST again for a 200, a declined 99-cent total, an order larger than the shelf), then read the three DLQs and `cdk destroy`. Watch for: the queue policy EventBridge needs on the SQS targets, the `TransactWriteItems` cancellation reasons' exact `Code` strings, and whether `charge.StubProvider` keeps its keys across warm invocations as assumed.
+
+15. **Chapter 4 idle-polling constant.** `cost.py` assumes Lambda keeps five 20-second long polls open per standard queue all month (1.3 million empty receives for two queues, $0.12). Leave the deployed stack idle for a day and read `NumberOfEmptyReceives` on the two queues; replace the constant.
+
+16. **Chapter 4 word count.** Prose is about 3 000 words with the exercises and answers (5 000 with the tables, diagrams and code), the same question as items 1 and 13.
+
 ## Done
+
+- 2026-10-22: chapter 4 written with its example; `make check` grew a `ch04-sim` target that runs the three functions through the simulator.
 
 - 2026-10-19: chapter 3 written with its example; `make check` grew a `ch03-run` target that runs the pipeline on synthetic data.
 
