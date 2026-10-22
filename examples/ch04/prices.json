@@ -1,0 +1,40 @@
+{
+  "_about": "List prices in USD for US East (N. Virginia), copied from the AWS Price List API (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/<service>/current/us-east-1/index.json). Copied on 2026-10-22: AWSQueueService 20260911124607 (SQS standard and FIFO request tiers; the first-million-free tier is part of the list price itself, like Scheduler and SNS, and is applied), AWSEvents 20260924163903 (EventBridge custom events, archive). Reused from chapters 1-3: AmazonApiGateway 20261012212611, AWSLambda 20261012223257, AmazonDynamoDB 20260911124422, AmazonSNS 20260915151944, AmazonCloudWatch 20261007115540, AmazonStates 20260911124511 (Step Functions, for the alternatives table). Where a price has tiers, the tiers cost.py uses are listed; everything else is first tier. No free-tier allowance is applied beyond zero-price first tiers in the list itself. The 2-write-units-per-transactional-item rule is from the DynamoDB developer guide (read/write capacity mode), not a price. Re-check before quoting to anyone.",
+  "api_gateway": {
+    "http_api_per_million_first_300m": 1.0
+  },
+  "lambda": {
+    "requests_per_million": 0.2,
+    "gb_second_arm_tier1": 0.0000133334
+  },
+  "eventbridge": {
+    "custom_events_per_million": 1.0,
+    "archive_per_gb": 0.10
+  },
+  "sqs": {
+    "standard_requests_tiers": [[1000000, 0.0], [null, 0.0000004]],
+    "fifo_requests_tiers": [[1000000, 0.0], [null, 0.0000005]],
+    "request_billing_increment_bytes": 65536
+  },
+  "dynamodb_on_demand": {
+    "write_request_units_per_million": 0.625,
+    "read_request_units_per_million": 0.125,
+    "storage_per_gb_month": 0.25,
+    "pitr_per_gb_month": 0.20,
+    "transactional_write_units_per_item": 2
+  },
+  "sns": {
+    "requests_tiers": [[1000000, 0.0], [null, 0.0000005]],
+    "email_tiers": [[1000, 0.0], [null, 0.00002]]
+  },
+  "cloudwatch": {
+    "alarm_standard_per_month": 0.10,
+    "logs_ingested_per_gb": 0.50,
+    "logs_storage_per_gb_month": 0.03
+  },
+  "step_functions": {
+    "standard_per_transition": 0.000025,
+    "express_per_million_requests": 1.0,
+    "express_gb_second_tier1": 0.00001667
+  }
+}
