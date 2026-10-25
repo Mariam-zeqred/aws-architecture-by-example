@@ -1,0 +1,45 @@
+{
+  "_about": "List prices in USD copied from the AWS Price List API (https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/<service>/current/<region>/index.json) on 2026-10-25. Primary region US East (N. Virginia), standby region EU (Ireland). Offer versions: AmazonDynamoDB 20260911124422 (both regions: write/read request units, replicated write request units, storage, PITR, restore), AmazonS3 20261015173540 (both regions: storage, Tier1 requests, Replication Time Control transfer), AWSDataTransfer 20260916132208 (us-east-1 to eu-west-1 inter-region transfer), AWSBackup 20261014001856 (DynamoDB warm backup storage in both regions, cross-region copy transfer, restore), AmazonRoute53 20260911124504 (hosted zone, health checks, alias queries). Reused from chapter 2: CloudWatch alarm and custom-metric prices (AmazonCloudWatch 20261007115540). First tier only; no free-tier allowance is applied, so DynamoDB storage ignores the 25 free GB-months and Route 53's free first 50 AWS-endpoint health checks IS applied because it is written into the list price itself (the first 50 cost $0.00). Two things could not be fetched from the sandbox and are from the AWS documentation as remembered: that global tables bill inter-region replication traffic at the inter-region transfer rate (modelled; it rounds to zero at every scale here), and that S3 replication metrics are four CloudWatch custom metrics per rule (ReplicationLatency, BytesPendingReplication, OperationsPendingReplication, OperationsFailedReplication). Each AWS Backup recovery point of a DynamoDB table is modelled as a full copy of the table. Re-check before quoting to anyone.",
+  "dynamodb": {
+    "us-east-1": {
+      "write_request_units_per_million": 0.625,
+      "replicated_write_request_units_per_million": 0.625,
+      "read_request_units_per_million": 0.125,
+      "storage_per_gb_month": 0.25,
+      "pitr_per_gb_month": 0.20,
+      "restore_per_gb": 0.15
+    },
+    "eu-west-1": {
+      "write_request_units_per_million": 0.705,
+      "replicated_write_request_units_per_million": 0.705,
+      "read_request_units_per_million": 0.1415,
+      "storage_per_gb_month": 0.283,
+      "pitr_per_gb_month": 0.22,
+      "restore_per_gb": 0.17
+    }
+  },
+  "s3": {
+    "storage_per_gb_month_first_50tb": 0.023,
+    "put_per_1k": 0.005,
+    "replication_time_control_per_gb": 0.015
+  },
+  "data_transfer": {
+    "us_east_1_to_eu_west_1_per_gb": 0.02
+  },
+  "backup": {
+    "dynamodb_warm_storage_per_gb_month": {"us-east-1": 0.10, "eu-west-1": 0.11},
+    "dynamodb_cross_region_copy_per_gb": 0.04,
+    "dynamodb_restore_per_gb": 0.15,
+    "s3_warm_storage_per_gb_month": 0.05
+  },
+  "route53": {
+    "hosted_zone_per_month": 0.50,
+    "health_check_aws_endpoint_tiers": [[50, 0.0], [null, 0.50]],
+    "health_check_fast_interval_option_per_month": 1.0,
+    "alias_queries_per_million": 0.0
+  },
+  "cloudwatch": {
+    "alarm_standard_per_month": 0.10,
+    "custom_metric_per_month": 0.30
+  }
+}

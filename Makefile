@@ -1,8 +1,8 @@
-.PHONY: check lint test synth cost example ch03-run ch04-sim
+.PHONY: check lint test synth cost example ch03-run ch04-sim ch05-drill
 
 PY ?= python3
 
-check: lint test synth cost ch03-run ch04-sim
+check: lint test synth cost ch03-run ch04-sim ch05-drill
 
 lint:
 	ruff check examples
@@ -19,6 +19,7 @@ synth:
 	cd examples/ch02 && $(PY) app.py && test -f cdk.out/Ch02TelemetryStack.template.json
 	cd examples/ch03 && $(PY) app.py && test -f cdk.out/Ch03BatchMlStack.template.json
 	cd examples/ch04 && $(PY) app.py && test -f cdk.out/Ch04OrdersStack.template.json
+	cd examples/ch05 && $(PY) app.py && test -f cdk.out/Ch05PrimaryStack.template.json && test -f cdk.out/Ch05StandbyStack.template.json
 
 # Print each chapter's cost table from its prices.json and assumptions.
 cost:
@@ -26,10 +27,11 @@ cost:
 	cd examples/ch02 && $(PY) cost.py
 	cd examples/ch03 && $(PY) cost.py
 	cd examples/ch04 && $(PY) cost.py
+	cd examples/ch05 && $(PY) cost.py
 
 # Chapter 3's pipeline end to end on a SYNTHETIC archive (10 devices, 21 days):
 # train a candidate, gate it, score every device. Writes to examples/ch03/local/.
-example: ch03-run ch04-sim
+example: ch03-run ch04-sim ch05-drill
 
 ch03-run:
 	cd examples/ch03 && rm -rf local && $(PY) pipeline/synth_archive.py local/archive --devices 10 --days 21
@@ -42,3 +44,10 @@ ch03-run:
 # and without their guards. In memory; prints the chapter's section 4 table.
 ch04-sim:
 	cd examples/ch04 && $(PY) sim.py --orders 500 --seed 1
+
+# Chapter 5's two drills: four disasters against four recovery strategies
+# (arithmetic over the parameters at the top of drill.py), then a counter
+# decremented from two regions of a fake global table with last-writer-wins
+# replication. In memory; prints the chapter's section 4 tables.
+ch05-drill:
+	cd examples/ch05 && $(PY) drill.py && $(PY) drill.py conflict
