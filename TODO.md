@@ -34,7 +34,7 @@
 
 19. **Two chapter 5 prices are from memory.** `prices.json` says so: that global-table replication traffic is billed at the inter-region transfer rate (rounds to zero here), and that S3 replication metrics are four CloudWatch custom metrics per rule, the largest line ($2.40 of $3.91) at the cooperative's size. Open the S3 user guide "Replication metrics" page and the DynamoDB pricing page (both blocked from the sandbox) and correct `prices.json` and the chapter's section 5 if either differs.
 
-20. **Chapter 5 word count.** Prose is about 3 000 words with the exercises, answers and reading list (5 000 with tables and code), the same question as items 1, 13 and 16.
+20. **Chapter 5 word count.** Prose is about 3 300 words with the exercises, answers and reading list (5 400 with tables and code; the 2026-10-25 review added the four exercise questions that were missing, about 260 words), the same question as items 1, 13 and 16.
 
 ## Done
 

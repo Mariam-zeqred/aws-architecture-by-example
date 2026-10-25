@@ -225,6 +225,10 @@ Again the third column: the stack covers the region and the mistake, and leaves 
 ## 7. Exercises
 
 1. **Telemetry through the outage.** The devices of chapter 2 publish to one region's IoT Core endpoint. For the six-hour outage, what does the farm page show, what is in the archive afterwards, and what would a device need to carry and do so that the gap is filled when the region returns? Say what the firmware would need without claiming the two real controllers already do it.
+2. **The 150 seconds.** From `HEALTH_INTERVAL`, `HEALTH_FAILURES` and the alias record's TTL, derive the worst case from the primary's first failed request to the moment every resolver that honours the TTL sends `api.coop.example` to Ireland. What does Route 53's fast interval buy, and what does it cost a month? Why would a TTL of 0 on the record not shorten the wait?
+3. **Moving the writes back.** The outage is over and the primary is healthy again, but chapter 4's consumers are running in Ireland. Write the runbook for moving them back, step by step. Which step is the dangerous one, which drill in section 4 shows why, and what exactly do you check before starting the consumers in the primary (it is not "the other region is healthy")?
+4. **The quarterly restore.** Section 6 says the restore drill should be run on purpose once a quarter. Design it: which recovery point, restored where, what you check against the live table, what you record and why the drill's parameters need it, what it costs at 17 megabytes and at 840 megabytes, and how the system would notice that nobody has run it for a hundred days.
+5. **The last row's "or".** In drill one's last row the warm standby reads "lost: ~1 s, or up to 24 h". Say what the "or" depends on, then name two measures that make the standby's copies survive credentials that can delete everything in the primary; for each, what it costs and what it does not cover. Why is a second region alone neither?
 
 <details>
 <summary>Answers</summary>
