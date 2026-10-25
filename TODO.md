@@ -28,7 +28,17 @@
 
 16. **Chapter 4 word count.** Prose is about 3 000 words with the exercises and answers (5 000 with the tables, diagrams and code), the same question as items 1 and 13.
 
+17. **Chapter 5 has never touched AWS.** Deploy the standby then the primary from a personal account with a real hosted zone (the `cdk.json` defaults are placeholders). Watch for: the replication role's permissions on both buckets (the stack strips the L2's fixed `CDKReplicationRole` name; confirm two roles deploy), the AWS Backup copy into the eu-west-1 vault, DNS validation of two certificates in one zone, the health check reaching the execute-api hostname, CloudFront reading the standby bucket under the account-wide policy, and that `from_table_name` in the standby grants on the replica's ARN. Then one real failover (invert the health check), one real PITR restore of the orders table, and `cdk destroy` with `-c protect_data=false`.
+
+18. **Chapter 5 restore time is assumed.** `drill.py` uses 20 minutes plus 5 per GB for a DynamoDB restore; the drill's "50 min" and "70 min" cells move with it. Replace it with the duration of the real restore from item 17.
+
+19. **Two chapter 5 prices are from memory.** `prices.json` says so: that global-table replication traffic is billed at the inter-region transfer rate (rounds to zero here), and that S3 replication metrics are four CloudWatch custom metrics per rule, the largest line ($2.40 of $3.91) at the cooperative's size. Open the S3 user guide "Replication metrics" page and the DynamoDB pricing page (both blocked from the sandbox) and correct `prices.json` and the chapter's section 5 if either differs.
+
+20. **Chapter 5 word count.** Prose is about 3 000 words with the exercises, answers and reading list (5 000 with tables and code), the same question as items 1, 13 and 16.
+
 ## Done
+
+- 2026-10-25: chapter 5 written with its example; `make check` grew a `ch05-drill` target that runs the two drills and synthesises both regions.
 
 - 2026-10-22: chapter 4 written with its example; `make check` grew a `ch04-sim` target that runs the three functions through the simulator.
 
