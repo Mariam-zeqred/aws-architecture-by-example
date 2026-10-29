@@ -36,7 +36,17 @@
 
 20. **Chapter 5 word count.** Prose is about 3 300 words with the exercises, answers and reading list (5 400 with tables and code; the 2026-10-25 review added the four exercise questions that were missing, about 260 words), the same question as items 1, 13 and 16.
 
+21. **Chapter 1 has no alarm and no topic** (chapter 6's review, REL-05, accepted until this item). Add a 5xx alarm on the HTTP API (`metric_server_error`, 5-minute period, one evaluation) with an SNS topic; the stack goes from 26 to 28 resources, so update chapter 1's text, the README row and `test_stack.py`, then delete the two acceptances in `examples/ch06/accepted.json` (the reviewer fails while they match nothing).
+
+22. **Chapter 5's standby has no alarm of its own** (REL-05 and OPS-03, accepted until this item). A 5xx alarm on the standby API, routed to the standby's own Alerts topic, so a failover that lands on a broken standby is noticed; add it in `RegionStack` for both roles or for the standby only, update the resource counts (42 + 23) in chapter 5 and the README, and delete the two acceptances.
+
+23. **Chapter 6 word count.** Prose is about 3 200 words with the exercises, answers and reading list (6 200 with the tables, which include the full 26 x 6 matrix), the same question as items 1, 13, 16 and 20. The matrix could move to the example README if the policy is to count tables.
+
+24. **Chapter 6's four CDK-related acceptances describe aws-cdk-lib 2.273's provider functions** (names, runtimes, architectures, the `Resource: *` statements). After any CDK upgrade run `make ch06-review`: a renamed provider either still matches the `Custom*Provider*` patterns or is reported as a stale acceptance, and a fixed statement should take its acceptance with it.
+
 ## Done
+
+- 2026-10-29: chapter 6 written with its example; `make check` grew a `ch06-review` target that synthesises the five chapters' production flavour, reviews them and rolls the costs up, and fails on an open finding. The review's fixes landed in the earlier chapters: `project` and `chapter` tags in every `app.py`, PITR on chapter 4's Stock table, explicit SSE-S3 on chapter 5's buckets, a throttle on chapters 4 and 5's default stages (no resource counts changed; chapters 4 and 5 gained a test each).
 
 - 2026-10-25: chapter 5 written with its example; `make check` grew a `ch05-drill` target that runs the two drills and synthesises both regions.
 

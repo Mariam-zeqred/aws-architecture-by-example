@@ -10,7 +10,7 @@ Your AWS certificates say you know the services; this course shows you can *desi
 
 - `chNN-<slug>.md`, one chapter: 1 500–3 000 words, one worked example, exercises with collapsed answers, "What to read next".
 - `examples/chNN/`, the chapter's CDK app (`app.py`, `stack.py`), any Lambda code, a `cost.py` + `prices.json`, and `tests/`. `make check` runs all chapters.
-- `README.md`, the table of contents; a chapter's row is filled in when it lands.
+- `README.md`, the table of contents; every chapter's row is filled in.
 
 ## Chapter 1 - Static site + API + DB
 
@@ -86,3 +86,18 @@ Your AWS certificates say you know the services; this course shows you can *desi
 *Verified / not.* ruff, 38 tests (144 in all), both templates synthesise in-process, `cost.py` and `drill.py` print the tables the chapter quotes. Not verified: anything against real AWS (replication roles, the cross-region backup copy, certificate validation, the health check, CloudFront reading the standby bucket); the restore-time parameter; the two prices named in `prices.json`.
 
 *Extend.* Exercise 3 as code: a `write_region` parameter in SSM read by chapter 4's consumers at start, so moving the write region is one `put-parameter` and a redeploy of nothing, and a test that a consumer refuses an order whose `accepted_in` is not its own region.
+
+## Chapter 6 - Cost and security review checklist
+
+*What it teaches.* A review is a list of questions a template, a bill or a drill can answer, and every finding ends in one of three states: fixed, accepted with a written reason, or scheduled with a TODO item; there is no "noticed and ignored". The six Well-Architected pillars are the index, not the method: each of the 26 questions names its pillar and the chapter that first answered it, so a question no chapter answered would be an opinion. Review the production flavour, not the one the tests synthesise. The money review starts from the largest lines, not the services: one line (chapter 2's on-demand writes) is 44 % of the cooperative's $122 a month, and one decision already priced in chapter 2 takes the whole system to $40.
+
+*The example.* `examples/ch06/review.py` synthesises chapters 1 to 5 with `retain_data`/`protect_data` on (via `CDK_CONTEXT_JSON`), reads the six templates as JSON and applies 26 rule functions; `accepted.json` holds 21 entries (29 findings) with reasons, four of them carrying a TODO item; the reviewer exits 1 on an open finding or a stale acceptance, and `make check` runs it. The first run found 139 findings; four code changes closed 110 (tags in every `app.py`, PITR on chapter 4's Stock, explicit encryption on chapter 5's buckets, a throttle on chapters 4 and 5's default stages through the CfnStage escape hatch). `rollup.py` imports the five `cost.py` files as they are, drops chapter 1's two double-counted lines, and prints the whole bill at two sizes with the three levers. 28 tests; the end-to-end one pins the matrix counts (102 pass, 21 accepted, 33 n/a).
+
+*Questions a professor may ask.*
+1. *Isn't this just cdk-nag?* Largely, and the chapter says so: cdk-nag's `AwsSolutions` pack has hundreds of maintained rules and a suppression mechanism with reasons, which is `accepted.json` with more rules. The point of writing 26 by hand is that each is tied to a failure an earlier chapter walked, so the review is of the course's decisions rather than a generic list; in a real team you would run both. Say that the rules read CloudFormation, not CDK, so they work on templates from any tool.
+2. *What does a template review not see?* A wrong value (a throttle of 10 000 passes SEC-07), a permission granted outside the stack, anything a deploy creates (the CDK providers' log groups), and performance altogether, which is measured rather than declared. Section 6's failure table is the honest list; AWS Config or Security Hub on the deployed account and a month of CloudWatch are the complements.
+3. *Why accept findings at all instead of fixing them?* Because some are the CDK's (the `Resource: *` on `ecr:GetAuthorizationToken` has no resource-level alternative), some are right for the data (PITR on a table rebuilt nightly is money for nothing), and a review that cannot say "no, and here is why" produces a backlog nobody reads. The discipline is that the reason is written where the next reviewer reads it, and a stale reason fails the build.
+
+*Verified / not.* ruff, 28 tests (175 in all), the six production templates synthesise, `review.py` exits 0 with the repo's acceptances and reports exactly the 29 findings without them, `rollup.py` prints the tables the chapter quotes, the Mermaid diagram rendered headlessly with mermaid 11. Not verified: anything against a deployed account (tags in a real Cost Explorer report, the activation delay exercise 4 describes); the four CDK-related reasons describe CDK 2.273's providers and may need re-reading after an upgrade; that S3 replication metrics are four per rule is still from documentation the sandbox could not reach.
+
+*Extend.* Write exercise 1's SEC-11 as a real rule with a test; then run cdk-nag's `AwsSolutions` pack over the same five stacks and compare its findings with the 29 here, which is the kind of comparison an interviewer would enjoy.
