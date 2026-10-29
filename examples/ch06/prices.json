@@ -1,0 +1,15 @@
+{
+  "_about": "The few list prices the idle floor needs, in USD, reused from earlier chapters' prices.json files rather than fetched again: CloudWatch standard alarm and custom metric (AmazonCloudWatch offer version 20261007115540, copied 2026-10-16 for chapter 2), Route 53 hosted zone and AWS-endpoint health checks (AmazonRoute53 20260911124504, copied 2026-10-25 for chapter 5; the first 50 AWS-endpoint health checks are $0.00 in the list price itself). That S3 replication publishes four CloudWatch custom metrics per rule is from documentation the sandbox could not reach, as chapter 5's prices.json says (verified: false). First tier, no free-tier allowance.",
+  "cloudwatch": {
+    "alarm_standard_per_month": 0.10,
+    "custom_metric_per_month": 0.30
+  },
+  "route53": {
+    "hosted_zone_per_month": 0.50,
+    "health_check_first_50_per_month": 0.00
+  },
+  "s3": {
+    "replication_metrics_per_rule": 4,
+    "replication_metrics_per_rule_verified": false
+  }
+}

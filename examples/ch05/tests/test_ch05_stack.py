@@ -11,6 +11,8 @@ from stack import (
     PRIMARY_REGION,
     STANDBY_REGION,
     TABLE_NAME,
+    THROTTLE_BURST,
+    THROTTLE_RATE,
     RegionStack,
 )
 
@@ -212,3 +214,16 @@ def test_protect_data_off_makes_everything_destroyable():
     assert all(not r["DeletionProtectionEnabled"] for r in table["Properties"]["Replicas"])
     buckets = t.find_resources("AWS::S3::Bucket").values()
     assert all(b["DeletionPolicy"] == "Delete" for b in buckets)
+
+
+@pytest.mark.parametrize("role", ["primary", "standby"])
+def test_chapter_six_review_fixes_buckets_say_their_encryption_and_the_stage_throttles(role):
+    t = synth(role)
+    for b in t.find_resources("AWS::S3::Bucket").values():
+        (rule,) = b["Properties"]["BucketEncryption"]["ServerSideEncryptionConfiguration"]
+        assert rule["ServerSideEncryptionByDefault"] == {"SSEAlgorithm": "AES256"}
+    (stage,) = t.find_resources("AWS::ApiGatewayV2::Stage").values()
+    assert stage["Properties"]["DefaultRouteSettings"] == {
+        "ThrottlingBurstLimit": THROTTLE_BURST,
+        "ThrottlingRateLimit": THROTTLE_RATE,
+    }

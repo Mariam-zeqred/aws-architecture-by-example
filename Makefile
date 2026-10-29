@@ -1,8 +1,8 @@
-.PHONY: check lint test synth cost example ch03-run ch04-sim ch05-drill
+.PHONY: check lint test synth cost example ch03-run ch04-sim ch05-drill ch06-review
 
 PY ?= python3
 
-check: lint test synth cost ch03-run ch04-sim ch05-drill
+check: lint test synth cost ch03-run ch04-sim ch05-drill ch06-review
 
 lint:
 	ruff check examples
@@ -31,7 +31,7 @@ cost:
 
 # Chapter 3's pipeline end to end on a SYNTHETIC archive (10 devices, 21 days):
 # train a candidate, gate it, score every device. Writes to examples/ch03/local/.
-example: ch03-run ch04-sim ch05-drill
+example: ch03-run ch04-sim ch05-drill ch06-review
 
 ch03-run:
 	cd examples/ch03 && rm -rf local && $(PY) pipeline/synth_archive.py local/archive --devices 10 --days 21
@@ -51,3 +51,11 @@ ch04-sim:
 # replication. In memory; prints the chapter's section 4 tables.
 ch05-drill:
 	cd examples/ch05 && $(PY) drill.py && $(PY) drill.py conflict
+
+# Chapter 6's review: synthesise chapters 1-5 in their production flavour
+# (data retained) into examples/ch06/local/, ask every template the 26
+# checklist questions, apply accepted.json, print the idle floor, then add
+# the five cost models up. review.py exits 1 on any finding that is neither
+# fixed nor accepted with a reason, so this target is the gate.
+ch06-review:
+	cd examples/ch06 && $(PY) review.py synth && $(PY) review.py && $(PY) rollup.py

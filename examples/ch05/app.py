@@ -20,6 +20,10 @@ protect_data = app.node.try_get_context("protect_data")
 protect_data = True if protect_data is None else bool(protect_data)
 account = os.environ.get("CDK_DEFAULT_ACCOUNT")
 
+# Chapter 6's review (COST-06): every taggable resource carries the project
+# and chapter, so the bill can be split by chapter in Cost Explorer.
+cdk.Tags.of(app).add("project", "aws-architecture-by-example")
+cdk.Tags.of(app).add("chapter", "ch05")
 for role, region in (("standby", STANDBY_REGION), ("primary", PRIMARY_REGION)):
     RegionStack(
         app,

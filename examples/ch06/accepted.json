@@ -1,0 +1,134 @@
+{
+  "_about": "Findings the review accepts, each with a reason and, where the acceptance is temporary, the TODO item that will close it. review.py exits 1 while a finding is neither fixed nor listed here, and also when an entry here no longer matches anything, so a fixed finding has to take its entry with it. `stack` and `resource` are fnmatch patterns over the stack name and the resource's logical id.",
+  "accepted": [
+    {
+      "rule": "SEC-04",
+      "stack": "Ch01HelloStack",
+      "resource": "CustomCDKBucketDeployment*",
+      "reason": "cloudfront:CreateInvalidation and GetInvalidation on * belong to the CDK's BucketDeployment provider, which invalidates the distribution after each upload. The statement is the CDK's own, the role is assumable only by that function, and it runs at deploy time. The fix is in the CDK, not in this stack."
+    },
+    {
+      "rule": "SEC-04",
+      "stack": "Ch03BatchMlStack",
+      "resource": "PipelineTaskExecutionRole*",
+      "reason": "ecr:GetAuthorizationToken has no resource-level permissions; AWS documents it as Resource *. The token alone pulls nothing: the role's ecr:BatchGetImage names the one repository."
+    },
+    {
+      "rule": "SEC-04",
+      "stack": "Ch03BatchMlStack",
+      "resource": "NightlyRole*",
+      "reason": "Two statements the CDK writes for an EcsRunTask state: ecs:StopTask and ecs:DescribeTasks on *, because a task's ARN does not exist until Step Functions starts it (RunTask itself is scoped to the task definition); and the logs:*LogDelivery actions for the state machine's logging, which have no resource-level permissions."
+    },
+    {
+      "rule": "REL-01",
+      "stack": "Ch02TelemetryStack",
+      "resource": "History*",
+      "reason": "Thirty days of readings expired by TTL; every reading is also in the archive bucket, so a mistaken delete is re-creatable from there. PITR is priced per GB-month on top of storage (chapter 2's prices.json) for a table that is rewritten every month."
+    },
+    {
+      "rule": "REL-01",
+      "stack": "Ch03BatchMlStack",
+      "resource": "Predictions*",
+      "reason": "Derived data: the nightly job overwrites every item each morning, so a lost table is one execution away."
+    },
+    {
+      "rule": "REL-02",
+      "stack": "Ch01HelloStack",
+      "resource": "Site*",
+      "reason": "The site is built from git and uploaded by every deploy; the bucket holds nothing that is not in the repository."
+    },
+    {
+      "rule": "REL-02",
+      "stack": "Ch02TelemetryStack",
+      "resource": "QueryResults*",
+      "reason": "Athena's scratch bucket; its objects expire after seven days by lifecycle rule."
+    },
+    {
+      "rule": "REL-05",
+      "stack": "Ch01HelloStack",
+      "resource": "*",
+      "reason": "Chapter 1 shipped with no alarm and no topic. A 5xx alarm on the HTTP API and an alerts topic add two resources and move the chapter's resource count, so they are scheduled rather than slipped in.",
+      "until": "TODO item 21"
+    },
+    {
+      "rule": "REL-05",
+      "stack": "Ch05StandbyStack",
+      "resource": "*",
+      "reason": "The standby is watched from outside: the primary's ReplicationLagging alarm and the Route 53 health check. Its own API serves only during a failover, which is exactly when a 5xx alarm on it would matter.",
+      "until": "TODO item 22"
+    },
+    {
+      "rule": "COST-02",
+      "stack": "*",
+      "resource": "Custom*Provider*",
+      "reason": "The CDK's singleton provider functions (auto-delete-objects, bucket deployment) run at deploy and destroy only; the log group Lambda creates for them holds a few lines per deploy. Retention for them is set on the provider, which is the CDK's."
+    },
+    {
+      "rule": "COST-02",
+      "stack": "*",
+      "resource": "CustomCDKBucketDeployment*",
+      "reason": "The CDK's bucket-deployment function, which uploads the site on each deploy; same as the provider functions above."
+    },
+    {
+      "rule": "COST-03",
+      "stack": "*",
+      "resource": "Custom*Provider*",
+      "reason": "The same CDK provider functions, x86 by the CDK's choice; they run for seconds per deploy."
+    },
+    {
+      "rule": "COST-04",
+      "stack": "Ch01HelloStack",
+      "resource": "Site*",
+      "reason": "About ten megabytes, overwritten by every deploy; nothing accumulates."
+    },
+    {
+      "rule": "COST-04",
+      "stack": "Ch03BatchMlStack",
+      "resource": "Archive*",
+      "reason": "The stand-in archive for a standalone deploy, fed by synth_archive.py. The real archive is chapter 2's, which has the 90-day transition to Infrequent Access; a deploy with -c archive_bucket= does not create this one."
+    },
+    {
+      "rule": "COST-06",
+      "stack": "*",
+      "resource": "Custom*Provider*",
+      "reason": "The CDK's CustomResourceProvider creates these as raw resources without a tag manager, so Tags.of(app) does not reach them. They run at deploy time only and cost nothing between deploys."
+    },
+    {
+      "rule": "COST-06",
+      "stack": "Ch05*",
+      "resource": "ApiHealth*",
+      "reason": "CloudFormation tags a health check through HealthCheckTags, which the CDK tag aspect does not set. Its cost line is $0 (the first fifty AWS-endpoint checks)."
+    },
+    {
+      "rule": "COST-06",
+      "stack": "Ch05*",
+      "resource": "Vault*",
+      "reason": "CloudFormation tags a vault through BackupVaultTags, which the CDK tag aspect does not set. The recovery points in it are chapter 5's AWS Backup line ($0.15 a month at the cooperative's size), reported under the table's tags instead."
+    },
+    {
+      "rule": "COST-06",
+      "stack": "Ch05PrimaryStack",
+      "resource": "DailyPlan*",
+      "reason": "CloudFormation tags a backup plan through BackupPlanTags, which the CDK tag aspect does not set; a plan has no cost line of its own."
+    },
+    {
+      "rule": "OPS-03",
+      "stack": "Ch01HelloStack",
+      "resource": "*",
+      "reason": "A page nobody visits is not broken: silence is chapter 1's normal state, and an alarm on it would be noise. Errors are a different question, scheduled as TODO item 21."
+    },
+    {
+      "rule": "OPS-03",
+      "stack": "Ch04OrdersStack",
+      "resource": "*",
+      "reason": "An order system with no orders is not broken. The Stuck alarms fire when work waits and nobody takes it, which is the failure that matters; treating missing data as breaching on a queue-age metric would page on every quiet night."
+    },
+    {
+      "rule": "OPS-03",
+      "stack": "Ch05StandbyStack",
+      "resource": "*",
+      "reason": "The standby's silence is its normal state until a failover, and the health check that decides a failover is on the primary. See REL-05 for the alarm it still lacks.",
+      "until": "TODO item 22"
+    }
+  ]
+}

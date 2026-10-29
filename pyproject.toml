@@ -1,5 +1,6 @@
 [tool.ruff]
 line-length = 100
+exclude = ["examples/ch06/local"]  # synthesised templates and CDK assets, not ours
 target-version = "py311"
 
 [tool.ruff.lint]
@@ -9,4 +10,4 @@ select = ["E", "F", "I", "UP", "B", "W"]
 testpaths = ["examples"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["stack", "handler", "ingest", "stale_scan", "cost", "archive", "cli", "features", "gate", "model", "storage", "synth_archive", "accept", "charge", "fulfil", "orders_common", "sim", "api", "drill"]
+known-first-party = ["review", "rollup", "stack", "handler", "ingest", "stale_scan", "cost", "archive", "cli", "features", "gate", "model", "storage", "synth_archive", "accept", "charge", "fulfil", "orders_common", "sim", "api", "drill"]

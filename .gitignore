@@ -36,6 +36,9 @@ package-lock.json
 # chapter 3's local pipeline run (make ch03-run)
 examples/ch03/local/
 
+# chapter 6's production-flavour templates (python review.py synth)
+examples/ch06/local/
+
 # large data
 *.parquet
 *.csv.gz

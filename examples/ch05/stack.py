@@ -63,6 +63,8 @@ BACKUP_RETENTION = cdk.Duration.days(35)
 # Global tables usually replicate in about a second; alarm when a change has
 # not reached the other region for two minutes.
 REPLICATION_LAG_ALARM = cdk.Duration.minutes(2)
+# The API's throttle (chapter 6's review, SEC-07): the same as chapter 1's.
+THROTTLE_RATE, THROTTLE_BURST = 50, 100
 
 
 class RegionStack(cdk.Stack):
@@ -123,6 +125,9 @@ class RegionStack(cdk.Stack):
                 bucket_name=bucket_name(kind, region),
                 versioned=True,  # required for replication; also the undo button
                 block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+                # Chapter 6's review (SEC-03): S3 encrypts by default since 2023,
+                # but a template that says so is one a reviewer can check.
+                encryption=s3.BucketEncryption.S3_MANAGED,
                 enforce_ssl=True,
                 removal_policy=data_policy,
                 lifecycle_rules=[
@@ -191,6 +196,13 @@ class RegionStack(cdk.Stack):
         )
         orders.grant_read_write_data(fn)
         api = apigw.HttpApi(self, "HttpApi", description=f"Chapter 5: {role} API in {region}")
+        # Chapter 6's review (SEC-07): the $default stage the L2 creates has no
+        # throttle; set one on the underlying CfnStage, keeping ``api.url``.
+        api.default_stage.node.default_child.default_route_settings = (
+            apigw.CfnStage.RouteSettingsProperty(
+                throttling_rate_limit=THROTTLE_RATE, throttling_burst_limit=THROTTLE_BURST
+            )
+        )
         integration = integrations.HttpLambdaIntegration("ApiIntegration", fn)
         api.add_routes(path="/health", methods=[apigw.HttpMethod.GET], integration=integration)
         api.add_routes(

@@ -4,7 +4,15 @@ import aws_cdk as cdk
 import pytest
 from aws_cdk.assertions import Match, Template
 
-from stack import ARCHIVE_RETENTION, BATCH_SIZE, CONSUMER_TIMEOUT, MAX_RECEIVE_COUNT, OrdersStack
+from stack import (
+    ARCHIVE_RETENTION,
+    BATCH_SIZE,
+    CONSUMER_TIMEOUT,
+    MAX_RECEIVE_COUNT,
+    THROTTLE_BURST,
+    THROTTLE_RATE,
+    OrdersStack,
+)
 
 
 @pytest.fixture(scope="module")
@@ -100,3 +108,19 @@ def test_consumers_may_publish_events_but_the_api_function_cannot_touch_stock(te
     assert len(puts) == 3  # accept, charge, fulfil
     accept = [p for name, p in policies.items() if name.startswith("Accept")]
     assert accept and "Stock" not in str(accept[0]["Properties"]["PolicyDocument"])
+
+
+def test_chapter_six_review_fixes_stock_has_pitr_and_the_default_stage_throttles(
+    template: Template,
+):
+    tables = template.find_resources("AWS::DynamoDB::GlobalTable")
+    assert len(tables) == 2
+    for t in tables.values():
+        (replica,) = t["Properties"]["Replicas"]
+        assert replica["PointInTimeRecoverySpecification"] == {"PointInTimeRecoveryEnabled": True}
+    (stage,) = template.find_resources("AWS::ApiGatewayV2::Stage").values()
+    assert stage["Properties"]["StageName"] == "$default"
+    assert stage["Properties"]["DefaultRouteSettings"] == {
+        "ThrottlingBurstLimit": THROTTLE_BURST,
+        "ThrottlingRateLimit": THROTTLE_RATE,
+    }

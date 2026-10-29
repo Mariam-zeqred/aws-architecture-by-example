@@ -13,6 +13,10 @@ from stack import HelloStack
 
 # Run by the CDK CLI, CDK_OUTDIR is set; run directly, write next to this file.
 app = cdk.App(outdir=os.environ.get("CDK_OUTDIR", "cdk.out"))
+# Chapter 6's review (COST-06): every taggable resource carries the project
+# and chapter, so the bill can be split by chapter in Cost Explorer.
+cdk.Tags.of(app).add("project", "aws-architecture-by-example")
+cdk.Tags.of(app).add("chapter", "ch01")
 HelloStack(
     app,
     "Ch01HelloStack",

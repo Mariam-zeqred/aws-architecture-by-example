@@ -40,6 +40,15 @@ CONSUMER_TIMEOUT = cdk.Duration.seconds(30)
 DLQ_RETENTION = cdk.Duration.days(14)  # the SQS maximum: time for a person to look
 ARCHIVE_RETENTION = cdk.Duration.days(30)
 STUCK_AFTER = cdk.Duration.minutes(15)  # oldest message older than this: consumer is stuck
+THROTTLE_RATE, THROTTLE_BURST = 50, 100  # chapter 6's review (SEC-07): a bug costs at most this
+
+
+def throttle_default_stage(api: apigw.HttpApi, *, rate_limit: int, burst_limit: int) -> None:
+    """Throttle the $default stage the L2 creates, keeping ``api.url`` intact."""
+    stage = api.default_stage.node.default_child
+    stage.default_route_settings = apigw.CfnStage.RouteSettingsProperty(
+        throttling_rate_limit=rate_limit, throttling_burst_limit=burst_limit
+    )
 
 
 class OrdersStack(cdk.Stack):
@@ -73,6 +82,11 @@ class OrdersStack(cdk.Stack):
             "Stock",
             partition_key=dynamodb.Attribute(name="sku", type=dynamodb.AttributeType.STRING),
             billing=dynamodb.Billing.on_demand(),
+            # Chapter 6's review (REL-01): stock counts are not derivable from
+            # anything else, so a mistaken write must be undoable here too.
+            point_in_time_recovery_specification=dynamodb.PointInTimeRecoverySpecification(
+                point_in_time_recovery_enabled=True
+            ),
             removal_policy=data_policy,
         )
         alerts = sns.Topic(self, "Alerts")
@@ -165,6 +179,7 @@ class OrdersStack(cdk.Stack):
         accept = function("Accept", "accept.lambda_handler", ORDERS_TABLE=orders.table_name)
         orders.grant_read_write_data(accept)
         api = apigw.HttpApi(self, "Api", description="Chapter 4: POST /orders")
+        throttle_default_stage(api, rate_limit=THROTTLE_RATE, burst_limit=THROTTLE_BURST)
         api.add_routes(
             path="/orders",
             methods=[apigw.HttpMethod.POST],
